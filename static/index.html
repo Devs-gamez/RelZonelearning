@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rel Zone</title>
+<style>
+:root{--bg:#07090f;--panel:#0e1220;--panel2:#151a2c;--text:#e8ecf7;--muted:#8a93ad;--line:#232a42;--accent:#5ee0ff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f1f3fa;--panel:#fff;--panel2:#e8ebf6;--text:#14182a;--muted:#5d6682;--line:#d3d8ea}}
+:root[data-theme="light"]{--bg:#f1f3fa;--panel:#fff;--panel2:#e8ebf6;--text:#14182a;--muted:#5d6682;--line:#d3d8ea}
+:root[data-theme="dark"]{--bg:#07090f;--panel:#0e1220;--panel2:#151a2c;--text:#e8ecf7;--muted:#8a93ad;--line:#232a42}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+body.cursive h1,body.cursive h2,body.cursive .brand{font-family:"Brush Script MT","Segoe Script",cursive;letter-spacing:.02em}
+#fog{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#glow{position:fixed;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;pointer-events:none;z-index:1;
+background:radial-gradient(circle,color-mix(in srgb,var(--accent) 28%,transparent),transparent 65%);left:-999px;top:-999px}
+body.perf #fog,body.perf #glow{display:none}
+#app{position:relative;z-index:2;display:flex;height:100%}
+nav{width:76px;background:color-mix(in srgb,var(--panel) 88%,transparent);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px}
+.brand{font-weight:700;color:var(--accent);font-size:15px;margin-bottom:10px}
+nav button{width:60px;background:none;border:0;color:var(--muted);padding:10px 0;border-radius:12px;cursor:pointer;font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button span{font-size:20px}
+nav button:hover{background:var(--panel2);color:var(--text)}
+nav button.on{background:var(--panel2);color:var(--accent)}
+nav .sp{flex:1}
+main{flex:1;overflow:auto;padding:28px;min-width:0}
+.view{display:none;max-width:900px;margin:0 auto}.view.on{display:block}
+.hero{text-align:center;padding:9vh 0 4vh}
+h1{font-size:clamp(48px,12vw,96px);margin:0;color:var(--accent);text-shadow:0 0 40px color-mix(in srgb,var(--accent) 45%,transparent);font-weight:300;letter-spacing:.08em}
+.hero p{color:var(--muted);margin:8px 0 22px}
+.search{display:flex;gap:8px;max-width:480px;margin:0 auto}
+input[type=text]{flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text);padding:12px 16px;border-radius:999px;font:inherit;outline:none;min-width:0}
+input[type=text]:focus{border-color:var(--accent)}
+.btn{background:var(--accent);color:#04121a;border:0;padding:11px 20px;border-radius:999px;font:inherit;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--panel2);color:var(--text)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-top:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;transition:.15s;text-align:left;color:inherit;font:inherit}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card .e{font-size:30px}.card b{display:block;margin-top:8px}.card small{color:var(--muted)}
+h2{margin:0 0 6px;font-weight:400}
+.sub{color:var(--muted);margin:0 0 18px}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:16px}
+canvas#snake{background:var(--bg);border-radius:10px;max-width:100%;touch-action:none}
+.pad{display:grid;grid-template-columns:repeat(3,52px);gap:6px}.pad button{height:46px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:18px;cursor:pointer}
+.mem{display:grid;grid-template-columns:repeat(4,70px);gap:8px}
+.mem button{height:70px;font-size:30px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);cursor:pointer}
+.mem button.up{background:var(--panel);border-color:var(--accent)}.mem button.done{opacity:.35}
+.ttt{display:grid;grid-template-columns:repeat(3,80px);gap:6px}
+.ttt button{height:80px;font-size:36px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--accent);cursor:pointer}
+.keys{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.key{width:56px;height:140px;background:var(--panel2);border:1px solid var(--line);border-radius:0 0 10px 10px;color:var(--muted);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;cursor:pointer;user-select:none;font-size:12px}
+.key.hit{background:var(--accent);color:#04121a}
+.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.row small{display:block;color:var(--muted)}
+.sw{appearance:none;width:42px;height:24px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;position:relative;cursor:pointer;flex:none}
+.sw:after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:.15s}
+.sw:checked{background:color-mix(in srgb,var(--accent) 35%,var(--panel2))}.sw:checked:after{left:20px;background:var(--accent)}
+select{background:var(--panel2);color:var(--text);border:1px solid var(--line);padding:8px;border-radius:8px;font:inherit}
+input[type=color]{border:0;width:40px;height:30px;background:none;padding:0;cursor:pointer}
+.status{color:var(--muted);min-height:20px}
+.chat{display:flex;flex-direction:column;height:min(62vh,560px);background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+#log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;padding:10px 14px;border-radius:14px;white-space:pre-wrap;line-height:1.45;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--accent);color:#04121a}
+.msg.bot{align-self:flex-start;background:var(--panel2)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 10px}
+.chips button{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:6px 12px;border-radius:99px;cursor:pointer;font:inherit;font-size:13px}
+.chips button:hover{border-color:var(--accent)}
+.compose{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+@media(max-width:560px){nav{width:58px}nav button{width:50px;font-size:10px}main{padding:16px}.mem{grid-template-columns:repeat(4,62px)}.mem button{height:62px}.key{width:40px}}
+#web{max-width:none}
+#web.on{display:flex;flex-direction:column;gap:8px;height:calc(100vh - 56px);height:calc(100dvh - 56px)}
+.wbar{display:flex;gap:8px}
+.wbar .btn{padding:10px 16px}
+#wframe{flex:1;min-height:0;width:100%;border:1px solid var(--line);border-radius:12px;background:#fff}
+</style>
+</head>
+<body>
+<canvas id="fog"></canvas><div id="glow"></div>
+<div id="app">
+<nav>
+  <div class="brand">rel zone</div>
+  <button data-v="home" class="on"><span>⌂</span>home</button>
+  <button data-v="games"><span>🎮</span>games</button>
+  <button data-v="music"><span>🎹</span>music</button>
+  <button data-v="ai"><span>✨</span>ai</button>
+  <button data-v="web"><span>🌐</span>web</button>
+  <div class="sp"></div>
+  <button data-v="settings"><span>⚙</span>settings</button>
+</nav>
+<main>
+<section class="view on" id="home">
+  <div class="hero"><h1>Rel Zone</h1><p id="greet">welcome back</p>
+    <div class="search"><input id="q" type="text" placeholder="search the hub…" autocomplete="off"><button class="btn" id="go">go</button></div>
+  </div>
+  <div class="grid" id="tiles"></div>
+</section>
+
+<section class="view" id="games">
+  <h2>games</h2><p class="sub">100 real browser games · each one opens inside Rel Zone through the proxy.</p>
+  <div class="grid" id="gamelist"></div>
+  <div class="stage" id="stage" hidden></div>
+</section>
+
+<section class="view" id="music">
+  <h2>piano</h2><p class="sub">Tap the keys or press A S D F G H J K.</p>
+  <div class="stage"><div class="keys" id="keys"></div>
+    <div class="row" style="border:0;width:100%;max-width:320px"><span>wave</span>
+    <select id="wave"><option>sine</option><option>triangle</option><option>square</option><option>sawtooth</option></select></div></div>
+</section>
+
+<section class="view" id="ai">
+  <h2>rel ai</h2><p class="sub">Ask questions, get help with homework, brainstorm or write. It can make mistakes, so double-check important answers. (v4)</p>
+  <div class="chat"><div id="log"></div>
+    <div class="chips" id="chips"></div>
+    <div class="compose"><input id="aiq" type="text" placeholder="ask anything…" autocomplete="off"><button class="btn" id="aisend">send</button><button class="btn ghost" id="ainew">new</button></div></div>
+</section>
+
+<section class="view" id="web">
+  <div class="wbar"><button class="btn ghost" id="wback" title="back">←</button><button class="btn ghost" id="wreload" title="reload">⟳</button>
+    <input id="wurl" type="text" placeholder="search or enter an address…" autocomplete="off"><button class="btn" id="wgo">go</button></div>
+  <div class="status" id="wstatus">Pages load inside Rel Zone through the server proxy. Search from home or type an address.</div>
+  <iframe id="wframe" sandbox="allow-scripts allow-forms" title="web"></iframe>
+</section>
+
+<section class="view" id="settings">
+  <h2>settings</h2><p class="sub">Saved in this browser only.</p>
+  <div class="row"><div>accent color<small>the main color used everywhere</small></div><input type="color" id="accent" value="#5ee0ff"></div>
+  <div class="row"><div>theme<small>follow your device or force one</small></div><select id="theme"><option value="auto">auto</option><option value="dark">dark</option><option value="light">light</option></select></div>
+  <div class="row"><div>fog background<small>animated fog behind everything</small></div><input type="checkbox" class="sw" id="fogOn" checked></div>
+  <div class="row"><div>cursor glow<small>soft light that follows the mouse</small></div><input type="checkbox" class="sw" id="glowOn" checked></div>
+  <div class="row"><div>cursive font<small>fancy font for titles</small></div><input type="checkbox" class="sw" id="cursive"></div>
+  <div class="row"><div>performance mode<small>turns off fog and glow if it lags</small></div><input type="checkbox" class="sw" id="perf"></div>
+  <div class="row"><div>search engine<small>used by the home search box</small></div><select id="engine"><option value="https://duckduckgo.com/?q=">DuckDuckGo</option><option value="https://www.google.com/search?q=">Google</option><option value="https://www.bing.com/search?q=">Bing</option></select></div>
+  <div class="row"><div>reset<small>put every setting back to default</small></div><button class="btn ghost" id="reset">reset</button></div>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+var DEF={accent:"#5ee0ff",theme:"auto",fog:true,glow:true,cursive:false,perf:false,engine:"https://duckduckgo.com/?q="};
+var S=Object.assign({},DEF);
+try{var raw=localStorage.getItem("oxy-settings");if(raw)S=Object.assign(S,JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem("oxy-settings",JSON.stringify(S))}catch(e){}}
+
+function apply(){
+  var r=document.documentElement;
+  r.style.setProperty("--accent",S.accent);
+  if(S.theme==="auto")r.removeAttribute("data-theme");else r.setAttribute("data-theme",S.theme);
+  document.body.classList.toggle("cursive",S.cursive);
+  document.body.classList.toggle("perf",S.perf);
+  $("#fog").style.display=(S.fog&&!S.perf)?"block":"none";
+  $("#glow").style.display=(S.glow&&!S.perf)?"block":"none";
+  $("#accent").value=S.accent;$("#theme").value=S.theme;$("#fogOn").checked=S.fog;
+  $("#glowOn").checked=S.glow;$("#cursive").checked=S.cursive;$("#perf").checked=S.perf;$("#engine").value=S.engine;
+}
+$("#accent").oninput=function(e){S.accent=e.target.value;save();apply()};
+$("#theme").onchange=function(e){S.theme=e.target.value;save();apply()};
+$("#engine").onchange=function(e){S.engine=e.target.value;save()};
+[["fogOn","fog"],["glowOn","glow"],["cursive","cursive"],["perf","perf"]].forEach(function(p){
+  $("#"+p[0]).onchange=function(e){S[p[1]]=e.target.checked;save();apply()}});
+$("#reset").onclick=function(){S=Object.assign({},DEF);save();apply()};
+
+var h=new Date().getHours();
+$("#greet").textContent=h<5?"up late?":h<12?"good morning":h<18?"good afternoon":"good evening";
+
+/* navigation */
+function show(v){
+  $$(".view").forEach(function(x){x.classList.toggle("on",x.id===v)});
+  $$("nav button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
+  if(v!=="games")stopGame();
+}
+$$("nav button").forEach(function(b){b.onclick=function(){show(b.dataset.v)}});
+var tiles=[["🎮","games","Snake, memory and tic-tac-toe","games"],["🎹","piano","Play notes with your keyboard","music"],["✨","ai","Ask Rel AI for help with anything","ai"],["⚙","settings","Colors, fog, cursor and more","settings"]];
+$("#tiles").innerHTML=tiles.map(function(t){return '<button class="card" data-v="'+t[3]+'"><div class="e">'+t[0]+'</div><b>'+t[1]+'</b><small>'+t[2]+'</small></button>'}).join("");
+$$("#tiles .card").forEach(function(c){c.onclick=function(){show(c.dataset.v)}});
+function search(){var q=$("#q").value.trim();if(q)openWeb(q)}
+$("#go").onclick=search;$("#q").onkeydown=function(e){if(e.key==="Enter")search()};
+
+/* fog + cursor */
+var fc=$("#fog"),fx=fc.getContext("2d"),blobs=[],W,H;
+function size(){W=fc.width=innerWidth;H=fc.height=innerHeight}
+size();addEventListener("resize",size);
+for(var i=0;i<6;i++)blobs.push({x:Math.random(),y:Math.random(),r:.25+Math.random()*.25,dx:(Math.random()-.5)*.00025,dy:(Math.random()-.5)*.00025});
+function fog(){
+  if(S.fog&&!S.perf){
+    fx.clearRect(0,0,W,H);
+    blobs.forEach(function(b){
+      b.x+=b.dx;b.y+=b.dy;if(b.x<-.1||b.x>1.1)b.dx*=-1;if(b.y<-.1||b.y>1.1)b.dy*=-1;
+      var R=b.r*Math.max(W,H),g=fx.createRadialGradient(b.x*W,b.y*H,0,b.x*W,b.y*H,R);
+      g.addColorStop(0,S.accent+"26");g.addColorStop(1,S.accent+"00");
+      fx.fillStyle=g;fx.fillRect(0,0,W,H);
+    });
+  }
+  requestAnimationFrame(fog);
+}
+fog();
+addEventListener("pointermove",function(e){var g=$("#glow");g.style.left=e.clientX+"px";g.style.top=e.clientY+"px"});
+
+/* games: 100 real browser games loaded through Rel Zone's proxy */
+var stopFn=null;
+function stopGame(){if(stopFn){stopFn();stopFn=null}var st=$("#stage");st.hidden=true;st.innerHTML=""}
+var gameLinks=[
+["1v1.LOL","https://1v1.lol/","🔫"],["Drift Boss","https://driftboss.io/","🏎️"],["Geometry Dash","https://www.geometrydash.com/","🟩"],["Slope","https://slopegame.io/","⛷️"],["Shell Shockers","https://shellshock.io/","🥚"],["Krunker","https://krunker.io/","🎯"],["Agar.io","https://agar.io/","🟢"],["Slither.io","https://slither.io/","🐍"],["Diep.io","https://diep.io/","🛡️"],["Paper.io","https://paper-io.com/","📄"],
+["ZombsRoyale.io","https://zombsroyale.io/","🧟"],["Smash Karts","https://smashkarts.io/","🏎️"],["Kour.io","https://kour.io/","🎯"],["Ev.io","https://ev.io/","⚡"],["Venge.io","https://venge.io/","🔫"],["Bullet Force","https://www.bulletforce.com/","💥"],["Forward Assault","https://www.forwardassault.io/","🎯"],["Repuls.io","https://repuls.io/","🚀"],["Voxiom.io","https://voxiom.io/","🧱"],["Bonk.io","https://bonk.io/","⚽"],
+["Gats.io","https://gats.io/","🔫"],["Surviv.io","https://surviv.io/","🪖"],["Superhex.io","https://superhex.io/","⬡"],["Little Big Snake","https://littlebigsnake.com/","🐍"],["Wormate.io","https://wormate.io/","🍬"],["Hole.io","https://holeio.com/","⚫"],["Paper.io 2","https://paper-io.com/","📄"],["Snowball.io","https://snowball.io/","❄️"],["MooMoo.io","https://moomoo.io/","🌳"],["Starve.io","https://starve.io/","🔥"],
+["Narwhale.io","https://narwhale.io/","🐋"],["Krunker Zombie","https://krunker.io/","🧟"],["Tetr.io","https://tetr.io/","🧩"],["Chess.com","https://www.chess.com/play/computer","♟️"],["Lichess","https://lichess.org/","♟️"],["Skribbl.io","https://skribbl.io/","✏️"],["Gartic Phone","https://garticphone.com/","📞"],["Little Alchemy 2","https://littlealchemy2.com/","🧪"],["Cookie Clicker","https://orteil.dashnet.org/cookieclicker/","🍪"],["2048","https://2048game.com/","🔢"],
+["Hextris","https://hextris.io/","⬡"],["Flappy Bird","https://flappybird.io/","🐦"],["Moto X3M","https://motox3m.co/","🏍️"],["Vex 6","https://vex6.io/","🏃"],["Vex 7","https://vex7.io/","🏃"],["Vex 8","https://vex8.io/","🏃"],["Run 3","https://run3.io/","🏃"],["Tunnel Rush","https://tunnelrush.io/","🌀"],["Fireboy & Watergirl","https://fireboywatergirl.io/","🔥"],["Action Games Hub","https://www.crazygames.com/c/action","🎮"],
+["Driving Games","https://www.crazygames.com/c/driving","🚗"],["Shooting Games","https://www.crazygames.com/c/shooting","🔫"],["Multiplayer Games","https://www.crazygames.com/c/multiplayer","👥"],["Racing Games","https://www.crazygames.com/c/racing","🏁"],["Sports Games","https://www.crazygames.com/c/sports","⚽"],["Puzzle Games","https://www.crazygames.com/c/puzzle","🧩"],["Arcade Games","https://www.crazygames.com/c/arcade","🕹️"],["IO Games","https://www.crazygames.com/c/io","🌐"],["Two Player Games","https://www.crazygames.com/c/2-player","👥"],["Strategy Games","https://www.crazygames.com/c/strategy","♟️"],
+["Action Games - Poki","https://poki.com/en/action","⚔️"],["Racing Games - Poki","https://poki.com/en/racing","🏎️"],["Sports Games - Poki","https://poki.com/en/sports","🏀"],["2 Player Games - Poki","https://poki.com/en/two-player","👥"],["Puzzle Games - Poki","https://poki.com/en/puzzle","🧩"],["Arcade Games - Poki","https://poki.com/en/arcade","🕹️"],["Adventure Games - Poki","https://poki.com/en/adventure","🗺️"],["Shooting Games - Poki","https://poki.com/en/shooting","🎯"],[".io Games - Poki","https://poki.com/en/io","🌐"],["New Games - Poki","https://poki.com/en/new","✨"],
+["Action Games - Coolmath","https://www.coolmathgames.com/1-action-games","⚡"],["Logic Games - Coolmath","https://www.coolmathgames.com/1-logic-games","🧠"],["Skill Games - Coolmath","https://www.coolmathgames.com/1-skill-games","🎯"],["Strategy Games - Coolmath","https://www.coolmathgames.com/1-strategy-games","♟️"],["Sports Games - Coolmath","https://www.coolmathgames.com/1-sports-games","🏀"],["Fireboy & Watergirl 2","https://www.coolmathgames.com/0-fireboy-and-water-girl-2","🔥"],["Fireboy & Watergirl 3","https://www.coolmathgames.com/0-fireboy-and-water-girl-3","🔥"],["Run 2","https://www.coolmathgames.com/0-run-2","🏃"],["Run 3 - Coolmath","https://www.coolmathgames.com/0-run-3","🏃"],["World's Hardest Game","https://www.coolmathgames.com/0-worlds-hardest-game","💀"],
+["Papa's Pizzeria","https://www.coolmathgames.com/0-papas-pizzeria","🍕"],["Papa's Freezeria","https://www.coolmathgames.com/0-papas-freezeria","🍦"],["Bloxorz","https://www.coolmathgames.com/0-bloxorz","🧊"],["Action Turnip","https://www.coolmathgames.com/0-action-turnip","🥕"],["Bob the Robber","https://www.coolmathgames.com/0-bob-the-robber","🥷"],["Fireboy & Watergirl 4","https://www.coolmathgames.com/0-fireboy-and-water-girl-4","🔥"],["Adventures of Pip","https://www.coolmathgames.com/0-adventures-of-pip","🗺️"],["Soccer Random","https://www.coolmathgames.com/0-soccer-random","⚽"],["Basket Random","https://www.coolmathgames.com/0-basket-random","🏀"],["Boxing Random","https://www.coolmathgames.com/0-boxing-random","🥊"],
+["Drift Hunters","https://www.crazygames.com/game/drift-hunters","🏎️"],["Super Star Car","https://www.crazygames.com/game/super-star-car","🏁"],["Highway Traffic","https://www.crazygames.com/game/highway-traffic","🚘"],["Moto X3M Pool Party","https://www.crazygames.com/game/moto-x3m-pool-party","🏍️"],["Stickman Hook","https://www.crazygames.com/game/stickman-hook","🪝"],["Raft Wars","https://www.crazygames.com/game/raft-wars","🛶"],["Action King: Draw Fight","https://www.crazygames.com/game/action-king-draw-fight","🥊"],["Getaway Shootout","https://www.crazygames.com/game/getaway-shootout","🏃"],["House of Hazards","https://www.crazygames.com/game/house-of-hazards","🏠"],["Masked Forces","https://www.crazygames.com/game/masked-forces","🎯"],["Bloxd.io","https://bloxd.io/","🧱"],["Miniblox","https://miniblox.io/","🧊"],["BuildNow GG","https://buildnow.gg/","🔫"],["Zombs.io","https://zombs.io/","🧟"],["Hordes.io","https://hordes.io/","⚔️"],["Survivor.io","https://survivor.io/","🧟"],["Mope.io","https://mope.io/","🐾"],["Krunker.io","https://krunker.io/","🎯"],["Chess Arena","https://www.chess.com/play/online","♟️"]
+];
+function renderGames(){
+  $("#gamelist").innerHTML=gameLinks.map(function(g,i){return '<button class="card" data-i="'+i+'"><div class="e">'+g[2]+'</div><b>'+g[0]+'</b><small>play through Rel Zone proxy</small></button>'}).join("");
+  $$("#gamelist .card").forEach(function(c){c.onclick=function(){var g=gameLinks[+c.dataset.i];openGame(g[1],g[0])}});
+}
+function openGame(url,name){
+  show("web");
+  wh=wh.slice(0,wi+1);wh.push(url);wi=wh.length-1;
+  load(url);wst.textContent="loading "+name+" through Rel Zone proxy…";
+}
+renderGames();
+
+/* ai (served by the Python backend) */
+var hist=[],busy=false,ctl=null;
+var log=$("#log");
+function addMsg(role,text){var m=document.createElement("div");m.className="msg "+role;m.textContent=text;log.appendChild(m);log.scrollTop=log.scrollHeight;return m}
+function aiReset(){hist=[];log.innerHTML="";addMsg("bot","Hi! I'm Rel AI. What are we working on?")}
+["Solve a problem","Check my work","Quiz me","Fix my writing"].forEach(function(t){
+  var b=document.createElement("button");b.textContent=t;b.onclick=function(){$("#aiq").value=t+": ";$("#aiq").focus()};$("#chips").appendChild(b)});
+async function ask(){
+  var q=$("#aiq").value.trim();if(!q||busy)return;
+  addMsg("me",q);$("#aiq").value="";
+  hist.push({role:"user",content:q});
+  var out=addMsg("bot","…"),acc="";busy=true;$("#aisend").disabled=true;
+  try{
+    ctl=new AbortController();
+    var r=await fetch("/api/chat",{method:"POST",signal:ctl.signal,headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:hist.slice(-12)})});
+    if(!r.ok){var er=new Error("http");er.status=r.status;try{er.detail=(await r.json()).detail}catch(_){}throw er}
+    var rd=r.body.getReader(),dec=new TextDecoder(),buf="";
+    for(;;){
+      var c=await rd.read();if(c.done)break;
+      buf+=dec.decode(c.value,{stream:true});
+      var lines=buf.split("\n");buf=lines.pop();
+      lines.forEach(function(l){
+        l=l.trim();if(l.indexOf("data:")!==0)return;
+        var d=l.slice(5).trim();if(!d||d==="[DONE]")return;
+        try{var t=JSON.parse(d).choices[0].delta.content;if(t){acc+=t;out.textContent=acc;log.scrollTop=log.scrollHeight}}catch(_){}
+      });
+    }
+    if(!acc)throw new Error("empty");
+    hist.push({role:"assistant",content:acc});
+  }catch(e){
+    if(e&&e.name==="AbortError")return;
+    out.textContent=!e||!e.status?"Can't reach the Rel Zone server ("+((e&&e.message)||"no response")+"). Open the site through python app.py at http://127.0.0.1:5000, not by double-clicking the HTML file.":
+      e.status===429?"Rate limited. Wait a moment, then send again.":
+      e.status===500?"Rel AI isn't set up on the server yet (missing GROQ_API_KEY in .env).":
+      e.status===401||e.status===403?"Groq rejected the API key. It may be wrong or revoked. Make a new one and put it in .env, then restart the server.":
+      "AI error ("+e.status+")"+(e.detail?": "+e.detail:"")+".";
+    try{var hc=await (await fetch("/api/health")).json();
+      out.textContent+="\n\nDiagnosis: "+(hc.problem||hc.result||"server check passed")}catch(_){}
+    hist.pop();
+  }
+  busy=false;$("#aisend").disabled=false;
+}
+$("#aisend").onclick=ask;$("#aiq").onkeydown=function(e){if(e.key==="Enter")ask()};
+$("#ainew").onclick=function(){if(ctl)ctl.abort();busy=false;$("#aisend").disabled=false;aiReset()};
+aiReset();
+
+/* web (served through the Python proxy at /proxy) */
+var wh=[],wi=-1,expect=null,wf=$("#wframe"),wbar=$("#wurl"),wst=$("#wstatus");
+function looksUrl(q){return /^https?:\/\//i.test(q)||/^[^\s\/]+\.[a-z]{2,}(\/\S*)?$/i.test(q)}
+function engineUrl(q){
+  var e=S.engine;
+  if(e.indexOf("duckduckgo")>-1)e="https://html.duckduckgo.com/html/?q=";
+  else if(e.indexOf("google")>-1)e="https://www.google.com/search?gbv=1&q=";
+  return e+encodeURIComponent(q);
+}
+function load(url){expect=url;wbar.value=url;wst.textContent="loading…";wf.src="/proxy?url="+encodeURIComponent(url)}
+function openWeb(input){
+  input=input.trim();if(!input)return;
+  show("web");
+  var t=looksUrl(input)?(/^https?:\/\//i.test(input)?input:"https://"+input):engineUrl(input);
+  wh=wh.slice(0,wi+1);wh.push(t);wi=wh.length-1;load(t);
+}
+addEventListener("message",function(e){
+  if(e.source!==wf.contentWindow||!e.data||!e.data.rz||typeof e.data.url!=="string")return;
+  var u=e.data.url;wbar.value=u;wst.textContent="via proxy · "+u;
+  if(expect!==null){expect=null;wh[wi]=u}          /* page we asked for (redirects update the address) */
+  else if(u!==wh[wi]){wh=wh.slice(0,wi+1);wh.push(u);wi=wh.length-1}  /* link clicked inside the page */
+});
+wf.onload=function(){if(wst.textContent==="loading…")wst.textContent="done"};
+$("#wgo").onclick=function(){openWeb(wbar.value)};
+wbar.onkeydown=function(e){if(e.key==="Enter")openWeb(wbar.value)};
+$("#wback").onclick=function(){if(wi>0){wi--;load(wh[wi])}};
+$("#wreload").onclick=function(){if(wi>=0)load(wh[wi])};
+
+/* piano */
+var ac=null,notes=[["C",261.63,"a"],["D",293.66,"s"],["E",329.63,"d"],["F",349.23,"f"],["G",392,"g"],["A",440,"h"],["B",493.88,"j"],["C",523.25,"k"]];
+function play(f){
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();
+    var o=ac.createOscillator(),g=ac.createGain();o.type=$("#wave").value;o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.3,ac.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+1.1);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+1.2)}catch(e){}
+}
+var kb=$("#keys");
+notes.forEach(function(n){var k=document.createElement("div");k.className="key";k.innerHTML=n[0]+"<br>&nbsp;"+n[2];k.dataset.k=n[2];
+  function hit(){play(n[1]);k.classList.add("hit");setTimeout(function(){k.classList.remove("hit")},150)}
+  k.onpointerdown=hit;k._hit=hit;kb.appendChild(k)});
+addEventListener("keydown",function(e){
+  if($("#music").classList.contains("on")&&!e.repeat){var k=kb.querySelector('[data-k="'+e.key.toLowerCase()+'"]');if(k)k._hit()}});
+
+apply();
+})();
+</script>
+</body>
+</html>
